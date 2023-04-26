@@ -20,3 +20,19 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
 connect_db(app)
+
+
+@app.get('/')
+def redirect_users():
+    """ Redirect home page to users page """
+
+    return redirect('/users')
+
+@app.get('/users')
+def get_users():
+    """ Show list of users """
+
+    users = User.query.all()
+
+    return render_template('users.html',
+                           users=users)

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Create a user</h1>
+{% endblock %}
+
+{% block content %}
+  <form action="/users/new" method="POST">
+    <div>First Name
+      <input type="text" name="first_name" value="{{ user.first_name }}" required>
+    </div>
+    <div>Last Name
+      <input type="text" name="last_name" value="{{ user.last_name }}" required>
+    </div>
+    <div>Image URL
+      <input type="url" name="image_url" value="{{ user.image_url }}">
+    </div>
+
+    <button>Add</button>
+  </form>
+
+{% endblock %}
