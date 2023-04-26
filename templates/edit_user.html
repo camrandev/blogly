@@ -2,9 +2,7 @@
 
 {% block content %}
   <h1>Create a user</h1>
-{% endblock %}
 
-{% block content %}
   <form action="/users/new" method="POST">
     <div>First Name
       <input type="text" name="first_name" value="{{ user.first_name }}" required>
