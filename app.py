@@ -131,7 +131,6 @@ def new_post_page(user_id):
 def added_new_post(user_id):
     """adding new post"""
 
-    user = User.query.get_or_404(user_id)
     title = request.form['title']
     content = request.form['content']
 

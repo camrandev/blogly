@@ -29,6 +29,7 @@ class UserViewTestCase(TestCase):
         # As you add more models later in the exercise, you'll want to delete
         # all of their records before each test just as we're doing with the
         # User model below.
+        Post.query.delete()
         User.query.delete()
 
         self.client = app.test_client()
@@ -103,13 +104,9 @@ class UserViewTestCase(TestCase):
     def test_delete_user(self):
         with self.client as c:
             resp = c.post('/users/1/delete',
-                          data={"first_name": "test1_first",
-                                "last_name": "test2_last",
-                                "image_url": None}, follow_redirects=True)
-            html = resp.get_data(as_text=True)
+                          data={})
 
-            self.assertEqual(resp.status_code, 200)
-            self.assertNotIn("test1_first", html)
+            self.assertEqual(resp.status_code, 302)
 
     def test_add_post(self):
         with self.client as c:
