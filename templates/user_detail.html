@@ -10,13 +10,19 @@
   <div class="d-flex flex-column p-2">
     <h1>{{ user.first_name }} {{ user.last_name }}</h1>
     <div class="d-flex p-2">
-      <!-- TODO: use boostrap link as button to handle one of gets -->
-      <form action="/users/{{ user.id }}/edit">
-        <button class="btn btn-info">Edit</button>
-      </form>
+        <p><a href="/users/{{ user.id }}/edit" class="btn btn-info">Edit</a></p>
       <form action="/users/{{ user.id }}/delete" method="POST">
         <button class="btn btn-danger">Delete</button>
       </form>
+    </div>
+    <div>
+      <h1>Posts</h1>
+      <ul>
+        {% for post in posts %}
+        <li><a href="/posts/{{ post.id }}">{{ post.title }}</a></li>
+        {% endfor %}
+      </ul>
+      <p><a href="/users/{{ user.id }}/posts/new" class="btn btn-primary">Add Post</a></p>
     </div>
   </div>
 </div>
