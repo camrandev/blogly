@@ -126,3 +126,54 @@ def added_new_post(user_id):
     flash("New post added!")
 
     return redirect(f"/users/{user_id}")
+
+@app.get('/posts/<int:post_id>')
+def show_post(post_id):
+    """shows an individual post page"""
+
+    #get the post from database
+    post = Post.query.get_or_404(post_id)
+    user = post.user
+
+    #render the post template
+    return render_template('post_detail.html', user=user, post=post)
+
+
+@app.get('/posts/<int:post_id>/edit')
+def edit_post(post_id):
+    """shows the page to edit a post"""
+
+    post = Post.query.get_or_404(post_id)
+    user = post.user
+
+    return render_template('edit_post.html', user=user, post=post)
+
+
+
+
+@app.post('/post/<int:post_id>/edit')
+def handle_edit(post_id):
+    """edit a post"""
+
+    post = Post.query.get(post_id)
+    post.title = request.form['title']
+    post.content = request.form['content']
+
+    db.session.commit()
+
+    flash('post edited')
+    return redirect(f'/posts/{post_id}')
+
+@app.post('/posts/<int:post_id>/delete')
+def delete_post(post_id):
+
+    post = Post.query.get_or_404(post_id)
+    user = post.user
+
+    db.session.delete(post)
+    db.session.commit()
+
+    return redirect(f'/users/{user.id}')
+
+
+
