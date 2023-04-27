@@ -1,11 +1,10 @@
+from models import DEFAULT_IMAGE_URL, User
+from app import app, db
+from unittest import TestCase
 import os
 
 os.environ["DATABASE_URL"] = "postgresql:///blogly_test"
 
-from unittest import TestCase
-
-from app import app, db
-from models import DEFAULT_IMAGE_URL, User
 
 # Make Flask errors be real errors, rather than HTML pages with error info
 app.config['TESTING'] = True
@@ -70,4 +69,51 @@ class UserViewTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn("Create a user", html)
+
+    def test_redirect_from_home_to_users(self):
+        """test the redirect from home to users"""
+        with self.client as c:
+            resp = c.get('/')
+
+            self.assertEqual(resp.status_code, 302)
+            self.assertEqual(resp.location, '/users')
+
+    def test_add_a_new_user(self):
+        """test the add a new user route"""
+        with self.client as c:
+            resp = c.post('/users/new',
+                          data={"first_name": "Lance",
+                                "last_name": "Stephenson",
+                                "image_url": None}, follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            # test if the new user exists in the DB
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('Lance', html)
+
+    def test_get_edit_user(self):
+        """test that the edit user route renders the correct page"""
+        with self.client as c:
+
+            resp = c.get("/users/1/edit")
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('Cancel', html)
+
+    # def test_delete_user(self):
+    #     with self.client as c:
+    #         resp = c.post('/users/1/delete',
+    #                       data={"first_name": "test1_first",
+    #                             "last_name": "test2_last",
+    #                             "image_url": None}, follow_redirects=True)
+    #         # html = resp.get_data(as_text=True)
+
+    # TODO: make sure deleted data is not in HTML
+
+    #         # test if the new user exists in the DB
+    #         all_users = db.query.all()
+    #         self.assertEqual(len(all_users), 0)
+
+
 

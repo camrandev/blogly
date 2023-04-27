@@ -50,7 +50,7 @@ def process_add_user():
     first_name = request.form['first_name']
     last_name = request.form['last_name']
     image_url = request.form['image_url']
-
+# TODO: update default image
     new_user = User(first_name = first_name, last_name=last_name, image_url=image_url)
     db.session.add(new_user)
     db.session.commit()
@@ -82,7 +82,7 @@ def process_user_edit(user_id):
     user.first_name = request.form['first_name']
     user.last_name = request.form['last_name']
     user.image_url = request.form['image_url']
-
+    # TODO: when editing, do not need to add
     db.session.add(user)
     db.session.commit()
 
@@ -91,7 +91,7 @@ def process_user_edit(user_id):
 @app.post('/users/<int:user_id>/delete')
 def delete_user(user_id):
     """ handles deleting user """
-
+# TODO: always use get_or_404
     user = User.query.get(user_id)
 
     db.session.delete(user)
