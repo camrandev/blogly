@@ -2,6 +2,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_utils import URLType
 
+DEFAULT_IMAGE_URL = 'https://staticg.sportskeeda.com/editor/2021/12/7f3a3-16401713211125-1920.jpg'
 
 db = SQLAlchemy()
 

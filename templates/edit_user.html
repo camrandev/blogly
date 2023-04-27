@@ -3,7 +3,7 @@
 {% block content %}
   <h1>Create a user</h1>
 
-  <form action="/users/new" method="POST">
+  <form action="/users/{{ user.id }}/edit" method="POST">
     <div>First Name
       <input type="text" name="first_name" value="{{ user.first_name }}" required>
     </div>
@@ -14,7 +14,10 @@
       <input type="url" name="image_url" value="{{ user.image_url }}">
     </div>
 
-    <button>Add</button>
+    <button class="btn btn-success">Save</button>
+    <form action="/users">
+      <button class="btn btn-outline-warning">Cancel</button>
+    </form>
   </form>
 
 {% endblock %}

@@ -57,6 +57,17 @@ class UserViewTestCase(TestCase):
         with self.client as c:
             resp = c.get("/users")
             self.assertEqual(resp.status_code, 200)
+
             html = resp.get_data(as_text=True)
             self.assertIn("test1_first", html)
             self.assertIn("test1_last", html)
+
+    def test_get_add_user(self):
+        """ test 'add user' navigates and renders proper page"""
+        with self.client as c:
+            resp = c.get("/users/new")
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("Create a user", html)
+

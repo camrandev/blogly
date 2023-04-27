@@ -64,3 +64,37 @@ def render_user_details(user_id):
     user = User.query.get(user_id)
 
     return render_template('user_detail.html', user=user )
+
+@app.get('/users/<int:user_id>/edit')
+def render_edit_user(user_id):
+    """ render edit user page """
+
+    user = User.query.get(user_id)
+
+    return render_template('edit_user.html',
+                           user=user)
+
+@app.post('/users/<int:user_id>/edit')
+def process_user_edit(user_id):
+    """ process user edit and redirect to /user page """
+
+    user = User.query.get(user_id)
+    user.first_name = request.form['first_name']
+    user.last_name = request.form['last_name']
+    user.image_url = request.form['image_url']
+
+    db.session.add(user)
+    db.session.commit()
+
+    return redirect('/users')
+
+@app.post('/users/<int:user_id>/delete')
+def delete_user(user_id):
+    """ handles deleting user """
+
+    user = User.query.get(user_id)
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return redirect('/users')
