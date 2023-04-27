@@ -28,6 +28,7 @@ def redirect_users():
 
     return redirect('/users')
 
+
 @app.get('/users')
 def get_users():
     """ Show list of users """
@@ -36,6 +37,7 @@ def get_users():
 
     return render_template('users.html',
                            users=users)
+
 
 @app.get('/users/new')
 def render_add_user():
@@ -55,7 +57,9 @@ def process_add_user():
     db.session.add(new_user)
     db.session.commit()
 
+    flash("User added!")
     return redirect('/users')
+
 
 @app.get('/users/<int:user_id>')
 def render_user_details(user_id):
@@ -69,6 +73,7 @@ def render_user_details(user_id):
                            user=user,
                            posts=posts)
 
+
 @app.get('/users/<int:user_id>/edit')
 def render_edit_user(user_id):
     """ render edit user page """
@@ -77,6 +82,7 @@ def render_edit_user(user_id):
 
     return render_template('edit_user.html',
                            user=user)
+
 
 @app.post('/users/<int:user_id>/edit')
 def process_user_edit(user_id):
@@ -89,7 +95,9 @@ def process_user_edit(user_id):
 
     db.session.commit()
 
+    flash("User info edited")
     return redirect('/users')
+
 
 @app.post('/users/<int:user_id>/delete')
 def delete_user(user_id):
@@ -97,10 +105,17 @@ def delete_user(user_id):
 
     user = User.query.get_or_404(user_id)
 
+    posts = user.posts
+    for post in posts:
+        db.session.delete(post)
+        db.session.commit()
+
     db.session.delete(user)
     db.session.commit()
 
+    flash("User deleted!")
     return redirect('/users')
+
 
 @app.get('/users/<int:user_id>/posts/new')
 def new_post_page(user_id):
@@ -110,6 +125,7 @@ def new_post_page(user_id):
 
     return render_template('new_post.html',
                            user=user)
+
 
 @app.post('/users/<int:user_id>/posts/new')
 def added_new_post(user_id):
@@ -124,18 +140,16 @@ def added_new_post(user_id):
     db.session.commit()
 
     flash("New post added!")
-
     return redirect(f"/users/{user_id}")
+
 
 @app.get('/posts/<int:post_id>')
 def show_post(post_id):
     """shows an individual post page"""
 
-    #get the post from database
     post = Post.query.get_or_404(post_id)
     user = post.user
 
-    #render the post template
     return render_template('post_detail.html', user=user, post=post)
 
 
@@ -149,9 +163,7 @@ def edit_post(post_id):
     return render_template('edit_post.html', user=user, post=post)
 
 
-
-
-@app.post('/post/<int:post_id>/edit')
+@app.post('/posts/<int:post_id>/edit')
 def handle_edit(post_id):
     """edit a post"""
 
@@ -161,8 +173,9 @@ def handle_edit(post_id):
 
     db.session.commit()
 
-    flash('post edited')
+    flash('Post edited')
     return redirect(f'/posts/{post_id}')
+
 
 @app.post('/posts/<int:post_id>/delete')
 def delete_post(post_id):
@@ -173,6 +186,7 @@ def delete_post(post_id):
     db.session.delete(post)
     db.session.commit()
 
+    flash('Post deleted!')
     return redirect(f'/users/{user.id}')
 
 

@@ -1,4 +1,4 @@
-from models import DEFAULT_IMAGE_URL, User
+from models import DEFAULT_IMAGE_URL, User,Post
 from app import app, db
 from unittest import TestCase
 import os
@@ -94,26 +94,81 @@ class UserViewTestCase(TestCase):
     def test_get_edit_user(self):
         """test that the edit user route renders the correct page"""
         with self.client as c:
-
             resp = c.get("/users/1/edit")
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('Cancel', html)
 
-    # def test_delete_user(self):
-    #     with self.client as c:
-    #         resp = c.post('/users/1/delete',
-    #                       data={"first_name": "test1_first",
-    #                             "last_name": "test2_last",
-    #                             "image_url": None}, follow_redirects=True)
-    #         # html = resp.get_data(as_text=True)
+    def test_delete_user(self):
+        with self.client as c:
+            resp = c.post('/users/1/delete',
+                          data={"first_name": "test1_first",
+                                "last_name": "test2_last",
+                                "image_url": None}, follow_redirects=True)
+            html = resp.get_data(as_text=True)
 
-    # TODO: make sure deleted data is not in HTML
+            self.assertEqual(resp.status_code, 200)
+            self.assertNotIn("test1_first", html)
 
-    #         # test if the new user exists in the DB
-    #         all_users = db.query.all()
-    #         self.assertEqual(len(all_users), 0)
+    def test_add_post(self):
+        with self.client as c:
+            resp = c.post("/users/1/posts/new",
+                          data={"title": "test_title",
+                                "content": "test_content"},
+                                follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("test_title", html)
+
+    def test_edit_post(self):
+            with self.client as c:
+                test_post = Post(
+                    title="test1_post",
+                    content="test1_content",
+                    user_id=1
+                )
+
+                db.session.add(test_post)
+                db.session.commit()
+
+                # c.get("/posts/1")
+                # c.get("/posts/1/edit")
+
+                resp = c.post("/posts/1/edit",
+                              data={"title": "edited_title",
+                                    "content": "edited_content"},
+                                    follow_redirects=True)
+
+                html = resp.get_data(as_text=True)
+
+                self.assertEqual(resp.status_code, 200)
+                self.assertIn("edited_title", html)
+
+
+    def test_delete_post(self):
+            with self.client as c:
+                    test_post = Post(
+                        title="test1_post",
+                        content="test1_content",
+                        user_id=1
+                    )
+
+                    db.session.add(test_post)
+                    db.session.commit()
+
+                    resp = c.post("/posts/1/delete",
+                                  data={},
+                                  follow_redirects=True)
+
+                    html = resp.get_data(as_text=True)
+
+                    self.assertEqual(resp.status_code, 200)
+                    self.assertNotIn("test1_post", html)
+
+
+
 
 
 
