@@ -5,9 +5,9 @@
   <div class="d-flex flex-column p-2">
     <h1>{{ post.title}}</h1>
     <p>{{post.content}}</p>
-    <i>by {{user.first_name}} {{user.last_name}}</i>
+    <i>by {{post.user.first_name}} {{post.user.last_name}}</i>
     <div class="d-flex p-2">
-      <p><a href="/users/{{ user.id }}" class="btn btn-outline-info">Cancel</a></p>
+      <p><a href="/users/{{ post.user_id }}" class="btn btn-outline-info">Cancel</a></p>
       <p><a href="/posts/{{ post.id }}/edit" class="btn btn-primary">Edit</a></p>
       <form action="/posts/{{ post.id }}/delete" method="POST">
         <button class="btn btn-danger">Delete</button>

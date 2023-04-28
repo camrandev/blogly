@@ -3,7 +3,7 @@
 import os
 
 from flask import Flask, request, redirect, render_template, flash
-from models import connect_db, User, Post, db, DEFAULT_IMAGE_URL
+from models import connect_db, User, Post,Tag, db, DEFAULT_IMAGE_URL
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_debugtoolbar import DebugToolbarExtension
@@ -26,7 +26,10 @@ connect_db(app)
 def redirect_users():
     """ Redirect home page to users page """
 
-    return redirect('/users')
+    posts = Post.query.limit(5)
+
+    return render_template("home.html",
+                           posts=posts)
 
 
 @app.get('/users')
@@ -91,7 +94,7 @@ def process_user_edit(user_id):
     user = User.query.get(user_id)
     user.first_name = request.form['first_name']
     user.last_name = request.form['last_name']
-    user.image_url = request.form['image_url']
+    user.image_url = request.form.get('image_url', DEFAULT_IMAGE_URL)
 
     db.session.commit()
 
@@ -104,11 +107,7 @@ def delete_user(user_id):
     """ handles deleting user """
 
     user = User.query.get_or_404(user_id)
-
-    posts = user.posts
-    for post in posts:
-        db.session.delete(post)
-        db.session.commit()
+    Post.query.filter(user_id==user.id).delete()
 
     db.session.delete(user)
     db.session.commit()
@@ -131,10 +130,13 @@ def new_post_page(user_id):
 def added_new_post(user_id):
     """adding new post"""
 
+    user = User.query.get_or_404(user_id)
+
     title = request.form['title']
     content = request.form['content']
 
-    new_post = Post(title=title, content=content, user_id=user_id)
+    new_post = Post(title=title, content=content, user_id=user.id)
+
     db.session.add(new_post)
     db.session.commit()
 
@@ -147,9 +149,8 @@ def show_post(post_id):
     """shows an individual post page"""
 
     post = Post.query.get_or_404(post_id)
-    user = post.user
 
-    return render_template('post_detail.html', user=user, post=post)
+    return render_template('post_detail.html', post=post)
 
 
 @app.get('/posts/<int:post_id>/edit')
@@ -166,7 +167,7 @@ def edit_post(post_id):
 def handle_edit(post_id):
     """edit a post"""
 
-    post = Post.query.get(post_id)
+    post = Post.query.get_or_404(post_id)
     post.title = request.form['title']
     post.content = request.form['content']
 
@@ -178,15 +179,42 @@ def handle_edit(post_id):
 
 @app.post('/posts/<int:post_id>/delete')
 def delete_post(post_id):
+    """delete post"""
 
     post = Post.query.get_or_404(post_id)
-    user = post.user
 
     db.session.delete(post)
     db.session.commit()
 
     flash('Post deleted!')
-    return redirect(f'/users/{user.id}')
+    return redirect(f'/users/{post.user_id}')
 
 
+@app.get('/tags')
+def get_tags():
+    """show tags list"""
 
+    tags = Tag.query.all()
+
+    return render_template("tags.html",
+                           tags=tags)
+
+@app.get('/tags/new')
+def get_tags_new():
+    """show add tag page"""
+
+    return render_template("add_tag.html")
+
+
+@app.post('/tags/new')
+def add_new_tag():
+    """add new tag"""
+
+    name = request.form["name"]
+
+    tag = Tag(name=name)
+
+    db.session.add(tag)
+    db.session.commit()
+
+    return redirect('/tags')

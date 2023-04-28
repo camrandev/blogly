@@ -19,6 +19,7 @@ app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 db.drop_all()
 db.create_all()
 
+"""TODO: class for each resource (noun) (posts, user view, tags, etc)"""
 
 class UserViewTestCase(TestCase):
     """Test views for users."""
@@ -102,12 +103,34 @@ class UserViewTestCase(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn('Cancel', html)
 
+    def test_edit_user(self):
+        """test to edit a user info"""
+        with self.client as c:
+            resp = c.post(f'/users/{self.user_id}/edit',
+                          data={"first_name": "edited_name",
+                                "last_name": "edited_lastname",
+                                "image_url": None},
+                                follow_redirects=True)
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("edited_name", html)
+
     def test_delete_user(self):
         with self.client as c:
             resp = c.post(f'/users/{self.user_id}/delete',
                           data={})
 
             self.assertEqual(resp.status_code, 302)
+
+    def test_get_add_post(self):
+        with self.client as c:
+            resp = c.get(f"/users/{self.user_id}/posts/new")
+
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code,200)
+            self.assertIn('Add Post', html)
 
     def test_add_post(self):
         with self.client as c:
@@ -120,6 +143,24 @@ class UserViewTestCase(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn("test_title", html)
 
+    def test_get_edit_post(self):
+        with self.client as c:
+            test_post = Post(
+                title="test1_post",
+                content="test1_content",
+                user_id=self.user_id
+            )
+
+            db.session.add(test_post)
+            db.session.commit()
+
+            resp = c.get(f'/posts/{test_post.id}/edit')
+
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code,200)
+            self.assertIn('Edit a post', html)
+
     def test_edit_post(self):
         with self.client as c:
             test_post = Post(
@@ -131,12 +172,12 @@ class UserViewTestCase(TestCase):
             db.session.add(test_post)
             db.session.commit()
 
-            self.post_id = test_post.id
+            # self.post_id = test_post.id
 
             # c.get("/posts/1")
             # c.get("/posts/1/edit")
 
-            resp = c.post(f"/posts/{self.post_id}/edit",
+            resp = c.post(f"/posts/{test_post.id}/edit",
                           data={"title": "edited_title",
                                 "content": "edited_content"},
                           follow_redirects=True)
@@ -161,7 +202,6 @@ class UserViewTestCase(TestCase):
             self.post_id = test_post.id
 
             resp = c.post(f"/posts/{self.post_id}/delete",
-                          data={},
                           follow_redirects=True)
 
             html = resp.get_data(as_text=True)

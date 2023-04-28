@@ -1,20 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Users</h1>
+  <h1>Tags</h1>
 
   <ul>
-    {% for user in users %}
+    {% for tag in tags %}
       <li >
-        <a href="/users/{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</a>
+        <a href="/tags/{{ tag.id }}">{{ tag.name }}</a>
       </li>
     {% endfor %}
   </ul>
 
-
   <div class="d-flex p-3">
-    <p><a href="users/new" class="btn btn-primary">Add user</a></p>
+    <p><a href="tags/new" class="btn btn-primary">Add tag</a></p>
     <p><a href="/" class="btn btn-success">Home</a></p>
   </div>
-
 {% endblock %}
